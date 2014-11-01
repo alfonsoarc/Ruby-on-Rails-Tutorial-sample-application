@@ -62,7 +62,7 @@ describe "Authentication" do
           before { visit edit_user_path(@user) }
           it { should have_title(full_title('Sign in')) }
         end
-        
+
         describe "visiting the users index" do
           before { visit users_path }
           it { should have_title(full_title('Sign in')) }
@@ -111,6 +111,25 @@ describe "Authentication" do
       end
       describe "submitting a PUT request to the Users#update action" do
         before { patch user_path(@wrong_user) }
+        specify { response.should redirect_to(root_path) }
+      end
+    end
+
+    describe "as non-admin user" do
+      before do
+        @user = User.new(name: "Example User", email: "user@example.com",
+        password: "foobar", password_confirmation: "foobar")
+        @user.save
+
+        @non_admin = User.new(name: "Non admin", email: "non_admin@example.com",
+        password: "foobar", password_confirmation: "foobar")
+        @non_admin.save
+
+        sign_in @non_admin
+      end
+
+      describe "submitting a DELETE request to the Users#destroy action" do
+        before { delete user_path(@user) }
         specify { response.should redirect_to(root_path) }
       end
     end

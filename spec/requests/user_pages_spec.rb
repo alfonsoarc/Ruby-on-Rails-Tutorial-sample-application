@@ -84,7 +84,7 @@ describe "User pages" do
     end
 
   end
-  
+
   describe "index" do
     before do
       @user1 = User.new(name: "Example User", email: "user@example.com",
@@ -100,11 +100,32 @@ describe "User pages" do
 
     it { should have_selector('h1', text: "All users") }
     it { should have_title(full_title("All users")) }
-    
+
     it { should have_selector('li', text: @user1.name) }
     it { should have_selector('li', text: @user2.name) }
-    
+
     # Pagination not tested. We trust rails :)
+
+    describe "delete links" do
+      it { should_not have_link('delete') }
+      
+      describe "as an admin user" do
+        before do
+          @admin = User.new(name: "Example User", email: "admin@example.com",
+          password: "foobar", password_confirmation: "foobar")
+          @admin.toggle!(:admin)
+          @admin.save
+          
+          sign_in @admin
+          visit users_path
+        end
+        it { should have_link('delete', href: user_path(@user1)) }
+        it "should be able to delete another user" do
+          expect { click_link('delete', href: user_path(@user1)) }.to change(User, :count).by(-1)
+        end
+        it { should_not have_link('delete', href: user_path(@admin)) }
+      end
+    end
 
   end
 
