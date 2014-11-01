@@ -1,4 +1,7 @@
 class UsersController < ApplicationController
+  before_filter :signed_in_user, only: [:edit, :update]
+  before_filter :correct_user, only: [:edit, :update]
+  
   def new
     @user = User.new
   end
@@ -16,12 +19,13 @@ class UsersController < ApplicationController
   end
 
   def edit
-    @user = User.find(params[:id])
+    # @user defined on correct_user
   end
 
   # From edit form, put to /users/user_id/edit to update action
   def update
-    @user = User.find(params[:id])
+    # @user defined on correct_user
+    
     #update_attributes update the corresponding user and calls save method
     #user_params!! private method
     if @user.update_attributes(user_params)
@@ -41,6 +45,19 @@ class UsersController < ApplicationController
 
   def user_params
     params.require(:user).permit(:name, :email, :password, :password_confirmation)
+  end
+
+  def signed_in_user
+    store_location
+    # EQUIVALENT
+    #flash[:notice] = "Please sign in."
+    #redirect to signin path
+    redirect_to signin_path, notice: "Please sign in." unless signed_in?
+  end
+
+  def correct_user
+    @user = User.find(params[:id])
+    redirect_to(root_path) unless current_user?(@user)
   end
 
 end

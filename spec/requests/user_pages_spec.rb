@@ -50,6 +50,7 @@ describe "User pages" do
         password: "foobar", password_confirmation: "foobar")
       @user.save
 
+      sign_in @user
       visit edit_user_path(@user)
     end
 
