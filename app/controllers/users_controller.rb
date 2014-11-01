@@ -1,7 +1,6 @@
 class UsersController < ApplicationController
-  before_filter :signed_in_user, only: [:edit, :update]
+  before_filter :signed_in_user, only: [:index, :edit, :update]
   before_filter :correct_user, only: [:edit, :update]
-  
   def new
     @user = User.new
   end
@@ -25,7 +24,7 @@ class UsersController < ApplicationController
   # From edit form, put to /users/user_id/edit to update action
   def update
     # @user defined on correct_user
-    
+
     #update_attributes update the corresponding user and calls save method
     #user_params!! private method
     if @user.update_attributes(user_params)
@@ -39,6 +38,10 @@ class UsersController < ApplicationController
 
   def show
     @user = User.find(params[:id])
+  end
+
+  def index
+    @users = User.paginate(page: params[:page])
   end
 
   private

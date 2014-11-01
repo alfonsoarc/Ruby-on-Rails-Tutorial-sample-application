@@ -84,5 +84,28 @@ describe "User pages" do
     end
 
   end
+  
+  describe "index" do
+    before do
+      @user1 = User.new(name: "Example User", email: "user@example.com",
+        password: "foobar", password_confirmation: "foobar")
+      @user1.save
+      @user2 = User.new(name: "Example User2", email: "user2@example.com",
+        password: "foobar", password_confirmation: "foobar")
+      @user2.save
+
+      sign_in @user1
+      visit users_path
+    end
+
+    it { should have_selector('h1', text: "All users") }
+    it { should have_title(full_title("All users")) }
+    
+    it { should have_selector('li', text: @user1.name) }
+    it { should have_selector('li', text: @user2.name) }
+    
+    # Pagination not tested. We trust rails :)
+
+  end
 
 end
