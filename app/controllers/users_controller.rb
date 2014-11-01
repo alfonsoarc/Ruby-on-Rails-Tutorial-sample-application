@@ -1,13 +1,8 @@
 class UsersController < ApplicationController
-  def show
-    @user = User.find(params[:id])
-    #debugger
-  end
-  
-  
   def new
     @user = User.new
   end
+
   # From new form, post to /users that goes to create action
   def create
     @user = User.new(user_params)
@@ -19,11 +14,33 @@ class UsersController < ApplicationController
       render 'new'
     end
   end
-  
-    private
 
-    def user_params
-      params.require(:user).permit(:name, :email, :password, :password_confirmation)
+  def edit
+    @user = User.find(params[:id])
+  end
+
+  # From edit form, put to /users/user_id/edit to update action
+  def update
+    @user = User.find(params[:id])
+    #update_attributes update the corresponding user and calls save method
+    #user_params!! private method
+    if @user.update_attributes(user_params)
+      flash[:success] = "Profile updated"
+      sign_in @user
+      redirect_to @user
+    else
+      render 'edit'
     end
-  
+  end
+
+  def show
+    @user = User.find(params[:id])
+  end
+
+  private
+
+  def user_params
+    params.require(:user).permit(:name, :email, :password, :password_confirmation)
+  end
+
 end
