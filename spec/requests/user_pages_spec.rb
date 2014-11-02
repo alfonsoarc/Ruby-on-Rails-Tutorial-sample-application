@@ -108,14 +108,14 @@ describe "User pages" do
 
     describe "delete links" do
       it { should_not have_link('delete') }
-      
+
       describe "as an admin user" do
         before do
           @admin = User.new(name: "Example User", email: "admin@example.com",
           password: "foobar", password_confirmation: "foobar")
           @admin.toggle!(:admin)
           @admin.save
-          
+
           sign_in @admin
           visit users_path
         end
@@ -125,6 +125,30 @@ describe "User pages" do
         end
         it { should_not have_link('delete', href: user_path(@admin)) }
       end
+    end
+
+  end
+
+  describe "profile page" do
+    before do
+      @user = User.new(name: "Example User", email: "user@example.com",
+        password: "foobar", password_confirmation: "foobar")
+      @user.save
+      @micropost1 = @user.microposts.build(content: "Foo")
+      @micropost2 = @user.microposts.build(content: "Bar")
+      @micropost1.save # microposts.count check the database
+      @micropost2.save
+
+      visit user_path(@user)
+    end
+
+    it { should have_title(full_title(@user.name)) }
+    it { should have_selector('h1', text: @user.name) }
+
+    describe "microposts" do
+      it { should have_content(@micropost1.content) }
+      it { should have_content(@micropost2.content) }
+      it { should have_content(@user.microposts.count) }
     end
 
   end
