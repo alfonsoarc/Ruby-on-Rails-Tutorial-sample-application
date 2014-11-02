@@ -28,10 +28,22 @@ describe "Static pages" do
           page.should have_selector("li##{item.id}", text: item.content)
         end
       end
+
+      describe "follower/following counts" do
+        before do
+          @other_user = User.new(name: "Other User", email: "other@example.com",
+          password: "foobar", password_confirmation: "foobar")
+          @other_user.save
+          @other_user.follow!(@user)
+          visit root_path
+        end
+        it { should have_link("0 following", href: following_user_path(@user)) }
+        it { should have_link("1 follower", href: followers_user_path(@user)) }
+      end
+
     end
 
   end
-  
 
   describe "Help page" do
     before { visit help_path }
