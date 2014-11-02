@@ -138,19 +138,31 @@ describe User do
       @unfollowed_user = User.new(name: "Unfollowed User", email: "unfolloweduser@example.com",
         password: "foobar", password_confirmation: "foobar")
       @unfollowed_user.save
+      
+      @followed_user = User.new(name: "followed User", email: "followeduser@example.com",
+        password: "foobar", password_confirmation: "foobar")
+      @followed_user.save
 
       @micropost1 = @user.microposts.build(content: "Foo")
       @micropost2 = @user.microposts.build(content: "Bar")
       @unfollowedMicropost = @unfollowed_user.microposts.build(content: "Bar")
+      @followedMicropost1 = @followed_user.microposts.build(content: "1")
+      @followedMicropost2 = @followed_user.microposts.build(content: "2")
       @micropost1.save
       @micropost2.save
       @unfollowedMicropost.save
+      @followedMicropost1.save
+      @followedMicropost2.save
+      
+      @user.follow!(@followed_user)
     end
 
     #Note here the method include to check for the present of an element in an array
     its(:feed) { should include(@micropost1) }
     its(:feed) { should include(@micropost2) }
     its(:feed) { should_not include(@unfollowedMicropost) }
+    its(:feed) { should include(@followedMicropost1) }
+    its(:feed) { should include(@followedMicropost2) }
 
   end
 
