@@ -10,7 +10,28 @@ describe "Static pages" do
     it { should have_content('Sample App') }
     it { should have_title(full_title('')) }
     it { should_not have_title('| Home') }
+
+    describe "for signed-in users" do
+      before do
+        @user = User.new(name: "Example User", email: "user@example.com",
+          password: "foobar", password_confirmation: "foobar")
+        @user.save
+
+        @micropost1 = @user.microposts.build(content: "Arg")
+        @micropost2 = @user.microposts.build(content: "Marineros")
+
+        sign_in @user
+        visit root_path
+      end
+      it "should render the user's feed" do
+        @user.feed.each do |item|
+          page.should have_selector("li##{item.id}", text: item.content)
+        end
+      end
+    end
+
   end
+  
 
   describe "Help page" do
     before { visit help_path }

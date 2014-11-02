@@ -18,6 +18,7 @@ describe User do
   it { should respond_to(:admin) }
   it { should respond_to(:authenticate) }
   it { should respond_to(:microposts) }
+  it { should respond_to(:feed) }
 
   it { should be_valid }
   it { should_not be_admin }
@@ -115,10 +116,35 @@ describe User do
     before { @user.save }
     its(:remember_token) { should_not be_blank }
   end
-  
+
   describe "with admin attribute set to 'true'" do
     before { @user.toggle!(:admin) }
     it { should be_admin }
+  end
+
+  describe "micropost associations" do
+    before do
+      @user = User.new(name: "Example User", email: "user@example.com",
+        password: "foobar", password_confirmation: "foobar")
+      @user.save
+
+      @unfollowed_user = User.new(name: "Unfollowed User", email: "unfolloweduser@example.com",
+        password: "foobar", password_confirmation: "foobar")
+      @unfollowed_user.save
+
+      @micropost1 = @user.microposts.build(content: "Foo")
+      @micropost2 = @user.microposts.build(content: "Bar")
+      @unfollowedMicropost = @unfollowed_user.microposts.build(content: "Bar")
+      @micropost1.save
+      @micropost2.save
+      @unfollowedMicropost.save
+    end
+
+    #Note here the method include to check for the present of an element in an array
+    its(:feed) { should include(@micropost1) }
+    its(:feed) { should include(@micropost2) }
+    its(:feed) { should_not include(@unfollowedMicropost) }
+
   end
 
 end
